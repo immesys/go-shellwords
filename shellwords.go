@@ -44,6 +44,7 @@ func NewParser() *Parser {
 func (p *Parser) Parse(line string) ([]string, error) {
 	args := []string{}
 	buf := ""
+	haveBuf := false
 	var escaped, doubleQuoted, singleQuoted, backQuote bool
 	backtick := ""
 
@@ -70,12 +71,13 @@ loop:
 			if singleQuoted || doubleQuoted || backQuote {
 				buf += string(r)
 				backtick += string(r)
-			} else if buf != "" {
+			} else if buf != "" || haveBuf {
 				if p.ParseEnv {
 					buf = replaceEnv(buf)
 				}
 				args = append(args, buf)
 				buf = ""
+				haveBuf = false
 			}
 			continue
 		}
@@ -100,11 +102,13 @@ loop:
 			}
 		case '"':
 			if !singleQuoted {
+				haveBuf = true
 				doubleQuoted = !doubleQuoted
 				continue
 			}
 		case '\'':
 			if !doubleQuoted {
+				haveBuf = true
 				singleQuoted = !singleQuoted
 				continue
 			}
@@ -121,7 +125,7 @@ loop:
 		}
 	}
 
-	if buf != "" {
+	if buf != "" || haveBuf {
 		if p.ParseEnv {
 			buf = replaceEnv(buf)
 		}

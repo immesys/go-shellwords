@@ -21,6 +21,9 @@ var testcases = []struct {
 	{`var "--bar baz"`, []string{`var`, `--bar baz`}},
 	{`var --"bar baz"`, []string{`var`, `--bar baz`}},
 	{`var  --"bar baz"`, []string{`var`, `--bar baz`}},
+	{`var '' --"bar baz"`, []string{`var`, ``, `--bar baz`}},
+	{`var '' --"bar baz" " "`, []string{`var`, ``, `--bar baz`, " "}},
+	{`var '' --"bar baz" " " ''`, []string{`var`, ``, `--bar baz`, ` `, ``}},
 }
 
 func TestSimple(t *testing.T) {
@@ -30,7 +33,7 @@ func TestSimple(t *testing.T) {
 			t.Fatal(err)
 		}
 		if !reflect.DeepEqual(args, testcase.expected) {
-			t.Fatalf("Expected %v, but %v:", testcase.expected, args)
+			t.Fatalf("Expextec %#v, but %#v:", testcase.expected, args)
 		}
 	}
 }
@@ -81,7 +84,7 @@ func TestBacktick(t *testing.T) {
 	}
 	expected := []string{"echo", goversion}
 	if !reflect.DeepEqual(args, expected) {
-		t.Fatalf("Expected %v, but %v:", expected, args)
+		t.Fatalf("Expextec %#v, but %#v:", expected, args)
 	}
 }
 
@@ -105,7 +108,7 @@ func TestEnv(t *testing.T) {
 	}
 	expected := []string{"echo", "bar"}
 	if !reflect.DeepEqual(args, expected) {
-		t.Fatalf("Expected %v, but %v:", expected, args)
+		t.Fatalf("Expextec %#v, but %#v:", expected, args)
 	}
 }
 
@@ -118,7 +121,7 @@ func TestNoEnv(t *testing.T) {
 	}
 	expected := []string{"echo", ""}
 	if !reflect.DeepEqual(args, expected) {
-		t.Fatalf("Expected %v, but %v:", expected, args)
+		t.Fatalf("Expextec %#v, but %#v:", expected, args)
 	}
 }
 
@@ -134,7 +137,7 @@ func TestDupEnv(t *testing.T) {
 	}
 	expected := []string{"echo", "$bar$"}
 	if !reflect.DeepEqual(args, expected) {
-		t.Fatalf("Expected %v, but %v:", expected, args)
+		t.Fatalf("Expextec %#v, but %#v:", expected, args)
 	}
 
 	args, err = parser.Parse("echo $${FOO_BAR}$")
@@ -143,7 +146,7 @@ func TestDupEnv(t *testing.T) {
 	}
 	expected = []string{"echo", "$baz$"}
 	if !reflect.DeepEqual(args, expected) {
-		t.Fatalf("Expected %v, but %v:", expected, args)
+		t.Fatalf("Expextec %#v, but %#v:", expected, args)
 	}
 }
 
@@ -158,7 +161,7 @@ func TestHaveMore(t *testing.T) {
 	}
 	expected := []string{"echo", "foo"}
 	if !reflect.DeepEqual(args, expected) {
-		t.Fatalf("Expected %v, but %v:", expected, args)
+		t.Fatalf("Expextec %#v, but %#v:", expected, args)
 	}
 
 	if parser.Position == 0 {
@@ -172,7 +175,7 @@ func TestHaveMore(t *testing.T) {
 	}
 	expected = []string{"seq", "1", "10"}
 	if !reflect.DeepEqual(args, expected) {
-		t.Fatalf("Expected %v, but %v:", expected, args)
+		t.Fatalf("Expextec %#v, but %#v:", expected, args)
 	}
 
 	if parser.Position > 0 {
